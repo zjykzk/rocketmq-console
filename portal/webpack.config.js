@@ -1,4 +1,5 @@
 const path = require('path')
+const apiMocker = require('mocker-api');
 
 module.exports = {
   entry: './src/index.js',
@@ -31,14 +32,23 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             presets: ['@babel/preset-env', '@babel/preset-react'],
-            plugins: [ ['import', { libraryName: "antd", style: true  }]
+            plugins: [
+              ['@babel/plugin-proposal-decorators', {
+                legacy: true
+              }],
+              ['@babel/plugin-proposal-class-properties', {'loose': true}],
+              ['import', { libraryName: "antd", style: true  }]
             ]
           }
         }
       },
     ]
   },
+  devtool: 'cheap-module-eval-source-map',
   devServer: {
-    contentBase: path.join(__dirname, 'public')
+    contentBase: path.join(__dirname, 'public'),
+    before(app){
+      apiMocker(app, path.resolve('./mock/index.js'))
+    }
   }
 };
